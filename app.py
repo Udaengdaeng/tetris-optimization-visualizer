@@ -23,27 +23,93 @@ st.set_page_config(
 st.markdown(
     """
 <style>
-.block-container {max-width: 1350px; padding-top: 1.4rem; padding-bottom: 2rem;}
+.block-container {
+    max-width: 1380px;
+    padding-top: 2.2rem;
+    padding-bottom: 2rem;
+}
+
 .main-title {
-    font-size: 2.3rem; font-weight: 800; color: #0f172a; margin-bottom: 0.2rem;
+    font-size: clamp(2rem, 2.6vw, 3rem);
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+    margin: 0;
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem;
+    word-break: keep-all;
 }
+
 .sub-title {
-    color: #475569; font-size: 1rem; margin-bottom: 1.1rem;
+    color: #475569;
+    font-size: 1rem;
+    margin-top: 0.35rem;
+    margin-bottom: 1.25rem;
 }
-.card {
-    background: white; border: 1px solid #e2e8f0; border-radius: 18px;
-    padding: 1rem 1.1rem; box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+
+.section-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 1.15rem 1.15rem 1rem 1.15rem;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+    margin-bottom: 1rem;
 }
+
+.section-title {
+    margin: 0 0 0.8rem 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
 .info-chip {
-    display: inline-block; padding: 0.25rem 0.6rem; border-radius: 999px;
-    background: #ecfeff; color: #155e75; font-size: 0.85rem; font-weight: 600;
-    margin-right: 0.35rem; margin-bottom: 0.35rem;
+    display: inline-block;
+    padding: 0.30rem 0.65rem;
+    border-radius: 999px;
+    background: #ecfeff;
+    color: #155e75;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-right: 0.35rem;
+    margin-bottom: 0.45rem;
 }
+
 .metric-card {
     background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-    border: 1px solid #e2e8f0; border-radius: 18px; padding: 0.9rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 0.9rem 1rem;
 }
-.small-muted {color: #64748b; font-size: 0.88rem;}
+
+.small-muted {
+    color: #64748b;
+    font-size: 0.88rem;
+}
+
+.guide-list {
+    margin: 0;
+    padding-left: 1.2rem;
+}
+
+.guide-list li {
+    margin-bottom: 0.45rem;
+}
+
+[data-testid="stDataFrame"] {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.stButton > button,
+.stDownloadButton > button {
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    scroll-margin-top: 100px;
+}
 </style>
 """,
     unsafe_allow_html=True,
@@ -79,6 +145,7 @@ PIECE_COLORS = {
 PIECE_CODE = {name: i + 1 for i, name in enumerate(BASE_PIECES.keys())}
 CODE_TO_PIECE = {v: k for k, v in PIECE_CODE.items()}
 VALID_SHAPES = list(BASE_PIECES.keys())
+
 
 # -------------------------
 # Core logic
@@ -353,9 +420,7 @@ def plot_board(board: np.ndarray, title: str = "Board"):
 
 
 def make_template_xlsx() -> bytes:
-    sample = pd.DataFrame({
-        "shape": ["I", "O", "T", "L", "S", "Z", "J", "T"]
-    })
+    sample = pd.DataFrame({"shape": ["I", "O", "T", "L", "S", "Z", "J", "T"]})
     bio = io.BytesIO()
     with pd.ExcelWriter(bio, engine="openpyxl") as writer:
         sample.to_excel(writer, index=False, sheet_name="input")
@@ -416,22 +481,28 @@ st.markdown(
 col_a, col_b = st.columns([1.3, 1.1], gap="large")
 
 with col_a:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown("### 📥 Input Guide")
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">📥 Input Guide</div>', unsafe_allow_html=True)
+    st.markdown("**엑셀 입력 방법**")
     st.markdown(
         """
-**엑셀 입력 방법**
-
-1. 첫 번째 열 이름을 가능하면 **`shape`** 로 만듭니다.  
-2. 각 행에 블록 종류를 한 개씩 입력합니다.  
-3. 허용값은 **I, O, T, S, Z, J, L** 입니다.  
-4. 입력 순서가 곧 **블록이 떨어지는 순서**입니다.  
-5. 빈 셀은 무시됩니다.
-        """
+<ol class="guide-list">
+    <li>첫 번째 열 이름을 가능하면 <strong><code>shape</code></strong> 로 만듭니다.</li>
+    <li>각 행에 블록 종류를 한 개씩 입력합니다.</li>
+    <li>허용값은 <strong>I, O, T, S, Z, J, L</strong> 입니다.</li>
+    <li>입력 순서가 곧 <strong>블록이 떨어지는 순서</strong>입니다.</li>
+    <li>빈 셀은 무시됩니다.</li>
+</ol>
+        """,
+        unsafe_allow_html=True,
     )
 
     st.markdown("**예시**")
-    st.dataframe(pd.DataFrame({"shape": ["I", "O", "T", "L", "S", "Z", "J"]}), use_container_width=True, hide_index=True)
+    st.dataframe(
+        pd.DataFrame({"shape": ["I", "O", "T", "L", "S", "Z", "J"]}),
+        use_container_width=True,
+        hide_index=True,
+    )
 
     st.markdown("**유의사항**")
     st.markdown(
@@ -450,11 +521,11 @@ with col_a:
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         use_container_width=True,
     )
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 with col_b:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown("### 🚀 Upload & Run")
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🚀 Upload & Run</div>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader(
         "엑셀 파일 업로드 (.xlsx)",
         type=["xlsx"],
@@ -468,8 +539,11 @@ with col_b:
     st.markdown(f"<span class='info-chip'>Top-K: {top_k_moves}</span>", unsafe_allow_html=True)
 
     run = st.button("▶ Run Optimization", type="primary", use_container_width=True)
-    st.markdown('<p class="small-muted">실행 후 최종 보드, 단계별 replay, placements 파일을 다운로드할 수 있습니다.</p>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="small-muted">실행 후 최종 보드, 단계별 replay, placements 파일을 다운로드할 수 있습니다.</p>',
+        unsafe_allow_html=True,
+    )
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # -------------------------
 # Run section
@@ -521,8 +595,8 @@ if run:
                 fig = plot_board(final_board, title=f"Final Tetris Board | lines={replay_lines}, game_score={replay_game_score}")
                 st.pyplot(fig, use_container_width=True)
             with c2:
-                st.markdown('<div class="card">', unsafe_allow_html=True)
-                st.markdown("### Result Summary")
+                st.markdown('<div class="section-card">', unsafe_allow_html=True)
+                st.markdown('<div class="section-title">Result Summary</div>', unsafe_allow_html=True)
                 st.markdown(
                     f"""
 - **Board size:** {board_width} × {board_height}
@@ -541,14 +615,17 @@ if run:
 - 각 블록은 선택된 회전과 x 위치에서 **위에서 아래로 hard drop** 된다.
                     """
                 )
-                st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown("</div>", unsafe_allow_html=True)
 
         with tab2:
             if history:
                 max_step = min(len(history), show_steps_limit)
                 step = st.slider("Replay step", min_value=1, max_value=max_step, value=min(5, max_step), step=1)
                 item = history[step - 1]
-                fig = plot_board(item["board"], title=f"Step {step} | piece={item['piece']} | rot={item['rotation_idx']} | x={item['x']} | cleared={item['cleared']}")
+                fig = plot_board(
+                    item["board"],
+                    title=f"Step {step} | piece={item['piece']} | rot={item['rotation_idx']} | x={item['x']} | cleared={item['cleared']}",
+                )
                 st.pyplot(fig, use_container_width=True)
             else:
                 st.warning("표시할 replay history가 없어.")
