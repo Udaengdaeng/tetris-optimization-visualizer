@@ -481,7 +481,6 @@ st.markdown(
 col_a, col_b = st.columns([1.3, 1.1], gap="large")
 
 with col_a:
-    st.markdown('<div class="section-card">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">📥 Input Guide</div>', unsafe_allow_html=True)
     st.markdown("**엑셀 입력 방법**")
     st.markdown(
@@ -524,7 +523,6 @@ with col_a:
     st.markdown("</div>", unsafe_allow_html=True)
 
 with col_b:
-    st.markdown('<div class="section-card">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">🚀 Upload & Run</div>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader(
         "엑셀 파일 업로드 (.xlsx)",
