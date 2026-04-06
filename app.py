@@ -47,13 +47,8 @@ st.markdown(
     margin-bottom: 1.25rem;
 }
 
-.section-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlockBorderWrapper"] {
     border-radius: 18px;
-    padding: 1.15rem 1.15rem 1rem 1.15rem;
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
-    margin-bottom: 1rem;
 }
 
 .section-title {
@@ -481,8 +476,8 @@ st.markdown(
 col_a, col_b = st.columns([1.3, 1.1], gap="large")
 
 with col_a:
-    st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">📥 Input Guide</div>', unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown('<div class="section-title">📥 Input Guide</div>', unsafe_allow_html=True)
     st.markdown("**엑셀 입력 방법**")
     st.markdown(
         """
@@ -514,18 +509,17 @@ with col_a:
         """
     )
 
-    st.download_button(
-        label="📄 엑셀 템플릿 다운로드",
-        data=make_template_xlsx(),
-        file_name="tetris_input_template.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        use_container_width=True,
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.download_button(
+            label="📄 엑셀 템플릿 다운로드",
+            data=make_template_xlsx(),
+            file_name="tetris_input_template.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True,
+        )
 
 with col_b:
-    st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">🚀 Upload & Run</div>', unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown('<div class="section-title">🚀 Upload & Run</div>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader(
         "엑셀 파일 업로드 (.xlsx)",
         type=["xlsx"],
@@ -538,12 +532,11 @@ with col_b:
     st.markdown(f"<span class='info-chip'>Beam width: {beam_width}</span>", unsafe_allow_html=True)
     st.markdown(f"<span class='info-chip'>Top-K: {top_k_moves}</span>", unsafe_allow_html=True)
 
-    run = st.button("▶ Run Optimization", type="primary", use_container_width=True)
-    st.markdown(
-        '<p class="small-muted">실행 후 최종 보드, 단계별 replay, placements 파일을 다운로드할 수 있습니다.</p>',
-        unsafe_allow_html=True,
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
+        run = st.button("▶ Run Optimization", type="primary", use_container_width=True)
+        st.markdown(
+            '<p class="small-muted">실행 후 최종 보드, 단계별 replay, placements 파일을 다운로드할 수 있습니다.</p>',
+            unsafe_allow_html=True,
+        )
 
 # -------------------------
 # Run section
@@ -595,27 +588,26 @@ if run:
                 fig = plot_board(final_board, title=f"Final Tetris Board | lines={replay_lines}, game_score={replay_game_score}")
                 st.pyplot(fig, use_container_width=True)
             with c2:
-                st.markdown('<div class="section-card">', unsafe_allow_html=True)
-                st.markdown('<div class="section-title">Result Summary</div>', unsafe_allow_html=True)
-                st.markdown(
-                    f"""
+                with st.container(border=True):
+                    st.markdown('<div class="section-title">Result Summary</div>', unsafe_allow_html=True)
+                    st.markdown(
+                        f"""
 - **Board size:** {board_width} × {board_height}
 - **Input blocks:** {len(sequence)}
 - **Lines cleared:** {replay_lines}
 - **Game score:** {replay_game_score}
 - **Search heuristic total:** {best.heuristic_total:.2f}
 - **Failed placements:** {sum(1 for p in best.placements if p.get('failed', False))}
-                    """
-                )
-                st.markdown("### Interpretation")
-                st.markdown(
-                    """
+                        """
+                    )
+                    st.markdown("### Interpretation")
+                    st.markdown(
+                        """
 - 이 결과는 **실제 테트리스 규칙**으로 재생된 최종 보드다.
 - 한 줄이 가득 차면 즉시 삭제된다.
 - 각 블록은 선택된 회전과 x 위치에서 **위에서 아래로 hard drop** 된다.
-                    """
-                )
-                st.markdown("</div>", unsafe_allow_html=True)
+                        """
+                    )
 
         with tab2:
             if history:
